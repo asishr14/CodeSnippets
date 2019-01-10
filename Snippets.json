@@ -1,24 +1,30 @@
 //Parse Resp
 var jsonData = JSON.parse(responseBody);
-postman.setEnvironmentVariable("apx_token", jsonData.Item);
+postman.setEnvironmentVariable("token", jsonData.Item);
 
 //Data Validation
 var data = JSON.parse(responseBody);
-tests["accountStatus"] = data.Item.accounts[0].accountStatus === "Pending";
-tests["fundingAccountAbbr"] = data.Item.accounts[0].fundingAccountAbbr === "4123";
+tests["accountStatus"] = data.Item.accounts[0].Status === "Pending";
+tests["fundingAccountAbbr"] = data.Item.accounts[0].AccountAbbr === "123";
 
 //Decision
 var body = JSON.parse(responseBody);
 if (body.HttpStatus !== 200)
 {
-  postman.setNextRequest("02 - Bypass underwriting QA");
+  postman.setNextRequest("Bypass");
 } 
 else 
 {
   console.log("Next request to be called in five mins");
-  postman.setNextRequest("03 - Get Account QA"); 
+  postman.setNextRequest("Account"); 
     
 }
+
+//Delay
+setTimeout(function()
+{
+    console.log('sleep for five min');
+}, 300000);
 
 //Add future date 
 var targetDate = new Date();
@@ -52,7 +58,7 @@ var response = JSON.parse(pm.response.text());
 var isAnon = JSON.parse(response.IsAnonymized.toLowerCase());
     
 if (isAnon){
-    postman.setNextRequest("Delete Document");
+    postman.setNextRequest("Delete");
 }
 else{
     
